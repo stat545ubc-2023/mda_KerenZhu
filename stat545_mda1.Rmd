@@ -203,7 +203,7 @@ missing_counts <- apt_buildings %>%
 print(missing_counts)
 ```
 
-**Exercise C:Explore the relationship between 2 variables in a plot.**
+**Exercise C: Explore the relationship between 2 variables in a plot. (No.4) **
 
 I choose this task because it fits the research question I listed previously: What is the relationship (or is there a relationship) between pets_allowed and property_type? As both pets_allowed and property_type are categorical variables, I choose to use contingency table and chi-square test to analyze. This plot can benefit further discussion in social science with topics like what's individual's rights in public space, the boundary of public and private, etc.
 
