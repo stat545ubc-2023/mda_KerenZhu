@@ -10,6 +10,7 @@ Explore 7 semi-tidy datasets from the *datateachr* package by Hayley Boyce and J
 ### Task 2: Exploring your dataset
 
 4 exercises were taken to explore my dataset as apt_buildings, namely:
+
 *Exercise A: Make a new tibble with a subset of your data, with variables and observations that you are interested in exploring.
 
 *Exercise B: Investigate how many missing values there are per variable. Can you find a way to plot this?
