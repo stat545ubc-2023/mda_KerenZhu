@@ -179,7 +179,6 @@ elevator <-apt_buildings %>%
   filter(!is.na(no_of_elevators))%>% #cleaned the data by filtering out the null data
   count(no_of_elevators)%>%
   rename(building_count=n)
-print(elevator)
 #visualize the distribution 
 elevator_plot <-ggplot(elevator, aes(no_of_elevators, building_count)) +
   geom_count(aes(size=building_count))+
@@ -187,10 +186,13 @@ elevator_plot <-ggplot(elevator, aes(no_of_elevators, building_count)) +
   theme_minimal()
 print(elevator_plot)
 ```
+
+
 **Exercise B:  Investigate how many missing values there are per variable. Can you find a way to plot this? (No.3)**
+
 I choose this task because it can help deepen my understanding of the dataset.For example, if one variable has too many missing value, this variable may not be qualified to conduct future research. This can also help users to explore the initial data collection process: which variable misses more values and requires more attention when we collect it next time.
 
-Visualization rationale:there are many variable_names, so I put it on the y axis instead of x.
+Visualization rationale: There are many variable_names, so I put it on the y axis instead of x.
 ```{r}
 missing_counts <- apt_buildings %>%
     summarize_all(~sum(is.na(.)))%>% #count missing values per variable 
@@ -198,9 +200,11 @@ missing_counts <- apt_buildings %>%
     ggplot(aes(x=missing_count,y=reorder(variable_names,missing_count))) +
     geom_col()+
     labs(title="The Number of Missing Values in Each Variable", x= "The Number of Missing Values", y= "Variable Names")
-print(missing_plot)
+print(missing_counts)
 ```
+
 **Exercise C:Explore the relationship between 2 variables in a plot.**
+
 I choose this task because it fits the research question I listed previously: What is the relationship (or is there a relationship) between pets_allowed and property_type? As both pets_allowed and property_type are categorical variables, I choose to use contingency table and chi-square test to analyze. This plot can benefit further discussion in social science with topics like what's individual's rights in public space, the boundary of public and private, etc.
 
 Visualization rationale: Because its a contingency table, I choose a mosaic plot to visualize it. Because the count is different among the three categories of property type, I use percentage. Green for yes and red for no, fits color symbolism. 
@@ -210,9 +214,9 @@ filter_missing_pets<-apt_buildings%>%
   filter(!is.na(pets_allowed))
 #create a contingency table and conduct chi-square test
 contingency_table <- table(filter_missing_pets$pets_allowed, filter_missing_pets$property_type)
-print(contingency_table)
-
 chi_square <- chisq.test(contingency_table)
+
+print(contingency_table)
 print(chi_square)
 
 # Create a new data frame from the contingency table for visualization
@@ -220,7 +224,6 @@ contingency_df <- as.data.frame(contingency_table)%>%
   `colnames<-`(c("PetsAllowed", "PropertyType", "Count")) %>%
     group_by(PropertyType) %>%
     mutate(Percentage = (Count / sum(Count)) * 100)
-print(contingency_df)
 # Create a mosaic plot 
 mosaic_plot <- 
   ggplot(contingency_df, aes(x = factor(PropertyType), y = Percentage, fill = PetsAllowed)) +
@@ -235,6 +238,7 @@ mosaic_plot <-
   theme_minimal()
 print(mosaic_plot)
 ```
+
 **Exercise D: Use a density plot to explore any of your variables (No.8)**
 
 In this exercise, I choose to use density plot to present the density of buildings built year. This plot is valuable because it can help audience to understand the history of apartment building construction in Toronto.
