@@ -167,7 +167,7 @@ Make sure that you're using dplyr and ggplot2 rather than base R for this task. 
 
 <!-------------------------- Start your work below ---------------------------->
 **Exercise A: Make a new tibble with a subset of your data, with variables and observations that you are interested in exploring. (No.8)**
-Here I choose to explore the number of elevators at each apartment building. I believe the outcome can benefit future research on architecture design, facilities for people with mobility difficulties, resource distribution, etc.
+Here I choose to explore the number of elevators at each apartment building: How are the number of elevators distributed among buildings? I believe the outcome can benefit future research on architecture design, facilities for people with mobility difficulties, resource distribution, etc.
 
 Visualization rationale: at first I thought to use geom_col(), but building_count ranges from 1337 to 1 make the visualization difficult. So I choose geom_count(), using position channel (horizontal and vertical) together with size channel (the size of the circle links to building_count) to present the data.
 ```{r}
@@ -190,17 +190,14 @@ print(elevator_plot)
 **Exercise B:  Investigate how many missing values there are per variable. Can you find a way to plot this? (No.3)**
 I choose this task because it can help deepen my understanding of the dataset.For example, if one variable has too many missing value, this variable may not be qualified to conduct future research. This can also help users to explore the initial data collection process: which variable misses more values and requires more attention when we collect it next time.
 
-Visualization rationale:there are many variable_names, so I put it on the y axis instead of x. 
+Visualization rationale:there are many variable_names, so I put it on the y axis instead of x.
 ```{r}
-#count missing values per variable 
 missing_counts <- apt_buildings %>%
-    summarize_all(~sum(is.na(.)))
-#change the dataframe from wide to long format
-missing_long<-gather(missing_counts, variable_names, missing_count)
-#make a plot
-missing_plot<-ggplot(missing_long, aes(x=missing_count,y=reorder(variable_names,missing_count))) +
-  geom_col()+
-  labs(title="The Number of Missing Values in Each Variable", x= "The Number of Missing Values", y= "Variable Names")
+    summarize_all(~sum(is.na(.)))%>% #count missing values per variable 
+    gather(key=variable_names, value=missing_count) %>% #make it from wide to long format to prepare for ggplot
+    ggplot(aes(x=missing_count,y=reorder(variable_names,missing_count))) +
+    geom_col()+
+    labs(title="The Number of Missing Values in Each Variable", x= "The Number of Missing Values", y= "Variable Names")
 print(missing_plot)
 ```
 **Exercise C:Explore the relationship between 2 variables in a plot.**
@@ -208,12 +205,11 @@ I choose this task because it fits the research question I listed previously: Wh
 
 Visualization rationale: Because its a contingency table, I choose a mosaic plot to visualize it. Because the count is different among the three categories of property type, I use percentage. Green for yes and red for no, fits color symbolism. 
 ```{r}
-#create a new tibble and clean the missing value in pets_allowed indicated by Exercise B
-property_pets<-apt_buildings%>%
-  select(property_type,pets_allowed)%>%
+#clean the missing value in pets_allowed indicated by Exercise B
+filter_missing_pets<-apt_buildings%>%
   filter(!is.na(pets_allowed))
 #create a contingency table and conduct chi-square test
-contingency_table <- table(property_pets$pets_allowed, property_pets$property_type)
+contingency_table <- table(filter_missing_pets$pets_allowed, filter_missing_pets$property_type)
 print(contingency_table)
 
 chi_square <- chisq.test(contingency_table)
@@ -222,27 +218,42 @@ print(chi_square)
 # Create a new data frame from the contingency table for visualization
 contingency_df <- as.data.frame(contingency_table)%>%
   `colnames<-`(c("PetsAllowed", "PropertyType", "Count")) %>%
-  group_by(PropertyType) %>%
-  mutate(Percentage = (Count / sum(Count)) * 100)
-
+    group_by(PropertyType) %>%
+    mutate(Percentage = (Count / sum(Count)) * 100)
+print(contingency_df)
 # Create a mosaic plot 
-mosaic_plot <- ggplot(contingency_df, aes(x = factor(PropertyType), y = Percentage, fill = PetsAllowed)) +
+mosaic_plot <- 
+  ggplot(contingency_df, aes(x = factor(PropertyType), y = Percentage, fill = PetsAllowed)) +
   geom_col() +
   labs(title = "Mosaic Plot of Property Type and Pets Allowed",
     x = "Property Type",
-    y = "Count",
+    y = "Percentage",
     fill = "Pets Allowed"
   ) +
   scale_fill_manual(values = c("red", "green")) +
   geom_text(aes(label = paste0(round(Percentage), "%")), position = position_stack(vjust = 0.5), size = 3) +
   theme_minimal()
 print(mosaic_plot)
-
 ```
 **Exercise D: Use a density plot to explore any of your variables (No.8)**
 
-building built by year
+In this exercise, I choose to use density plot to present the density of buildings built year. This plot is valuable because it can help audience to understand the history of apartment building construction in Toronto.
 
+Visualization rationale: A common use of a density plot is to visualize the distribution of data over a time period.
+```{r}
+density_plot <- apt_buildings%>%
+  filter(!is.na(year_built))%>% #filter out the missing value indicated by Exercise B
+  ggplot(aes(year_built)) +
+  geom_density() +  
+  labs(
+    title = "Density Plot",
+    x = "Year Built",
+    y = "Density"
+  ) +
+  theme_minimal()
+
+print(density_plot)
+```
 
 <!----------------------------------------------------------------------------->
 
@@ -251,7 +262,12 @@ building built by year
 **(4 points)** So far, you have chosen a dataset and gotten familiar with it through exploring the data. You have also brainstormed one research question that interested you (Task 1.4).  Now it's time to pick 4 research questions that you would like to explore in Milestone 2! Write the 4 questions and any additional comments below. 
 
 <!--- *****START HERE***** --->
-
+**Four Questions for Milestone 2**
+*What is the density of building registered year?
+*How are the number of storeys distributed among buildings? 
+*How is the distribution of separate gas, hydro, and water meter services among buildings?
+*What is the relationship between window types and year built?
+Note: All shall be explored in a plot.
 <!----------------------------->
 
 # Overall reproducibility/Cleanliness/Coherence Checklist 
