@@ -99,47 +99,49 @@ Make sure it's clear what research question you are doing each operation for!
 
 **Q1.1 Summarizing**
 
-*Task*: Compute the *range*, *mean*, and *two other summary statistics* of **one numerical variable** across the groups of **one categorical variable** from your data. (Task 1)
+*Task*: Create a categorical variable with 3 or more groups from an existing numerical variable. You can use this new variable in the other tasks (Task 3).
 numeric variable: year_registered
-categorical variable: fire_alarm 
-two other summary statistics: median, standard deviation
+categorical variable: year_reg_group with 3 groups (year before 2017, year 2017, year after 2017)
 
-*Comment*: This task is helpful. Taking year_registered as a numeric variable can support analyzing the trends of information management for building constructions, including the density of building registered year. Particularly, computing mean and median offers a comprehensive view of central tendency, while range and standard deviation helps with understanding statistical dispersion. In addition, attaching pets_allowed as a categorical variable to the initial questions can add values for exploring the public's welcomeness towards pets over recent years.
+*Comment*: This task is helpful. While designing the question at the first stage for MDA1, I thought year_registered would be like year_built and a density plot is applicable. Indeed, the original data set apt_buildings gives year_registered dbl data type. However, through _"explore year_registered"_, I found the range and variety of year_registered is not as wide as year_built. While year_built ranges from 1805-2019, buildings mainly registered in 2017. Thereby, I set a new categorical variable named year_reg_group with 3 groups (year before 2017, year 2017, year after 2017) with an assumption that 2017 is an identical year for building registration and management. This task thus can serve as a preparation for future tasks to explore the City of Toronto's advancement in managing apartment buildings, which is aligned with the primary goal of bringing up _Question 1_.
+
 ```{r}
-#Have an overview of the data I will use as preparation
-
-#check data types:
+#explore year_registered:
 class(apt_buildings$year_registered)
-class(apt_buildings$pets_allowed)
-#check all categories under pets_allowed  and if there are missing values
-unique(apt_buildings$pets_allowed)
-missing_fire<-is.na(apt_buildings$pets_allowed)
-missing_year<-is.na(apt_buildings$year_registered)
-if (any(missing_fire)){print("yes missing_fire")} else {print("no missing_fire")}
-if (any(missing_year)){print("yes missing_year")} else {print("no missing_year")}
-
+summary(apt_buildings$year_registered)
+summary(apt_buildings$year_built) 
+  
 #clean and compute
-answer1.1<-apt_buildings%>%
-  filter(!is.na(apt_buildings$pets_allowed) & !is.na(apt_buildings$year_registered)) %>%
-  group_by(pets_allowed)%>%
-  summarize(
-    Range= paste("from", min(year_registered), "to", max(year_registered)),
-    Mean=mean(year_registered),
-    Median=median(year_registered),
-    StdDev=sd(year_registered)
-  )
-print(answer1.1)
-
+apt_year_reg <-apt_buildings%>%
+  filter(!is.na(year_registered)) %>%
+  mutate(
+    year_reg_group = 
+      factor(case_when(year_registered < 2017 ~ "year before 2017",
+      year_registered == 2017 ~ "year 2017",
+      year_registered > 2017 ~ "year after 2017"),
+    levels=c('year before 2017','year 2017','year after 2017')))
+print(apt_year_reg)
 ```
+
+
 
 **Q1.2 Graphing**
 
-*Task*: Create a graph that has at least two geom layers (Task 8).
+*Task*: (Task 7).
 
 *Comment*:
 
 ```{r}
-
+built_reg_violin <- apt_year_reg%>%
+  filter(!is.na(year_built))%>% #drop rows have missing values in year_built
+  ggplot(aes(x=year_reg_group, y=year_built))+
+  geom_violin(scale = "area")+
+  scale_x_discrete(drop = FALSE) + # Don't drop the year before 2017
+  labs(title="The Violin Plot of Building's Built Year by Registration Year Cateogory from 1805 to 2020 ",
+    x= "Registration Year Cateogory",
+    y="Built Year")+
+  theme_minimal()
+print(built_reg_point)
 ```
 
 *Q2How are the number of storeys distributed among buildings?*
