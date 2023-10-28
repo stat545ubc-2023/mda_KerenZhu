@@ -46,6 +46,8 @@ Begin by loading your data and the tidyverse package below:
 ```{r, message = FALSE}
 library(datateachr) # <- might contain the data you picked!
 library(tidyverse)
+library(dplyr)
+library(ggplot2)
 ```
 
 # Task 1: Process and summarize your data 
@@ -93,15 +95,49 @@ Using variables and/or tables you made in one of the "Summarizing" tasks:
 Make sure it's clear what research question you are doing each operation for!
 
 <!------------------------- Start your work below ----------------------------->
-*Q1What is the density of building registered year?*
-*Q1.1Summarizing*
-comment:
+**Q1 What is the density of building registered year?**
+
+**Q1.1 Summarizing**
+
+*Task*: Compute the *range*, *mean*, and *two other summary statistics* of **one numerical variable** across the groups of **one categorical variable** from your data. (Task 1)
+numeric variable: year_registered
+categorical variable: fire_alarm 
+two other summary statistics: median, standard deviation
+
+*Comment*: This task is helpful. Taking year_registered as a numeric variable can support analyzing the trends of information management for building constructions, including the density of building registered year. Particularly, computing mean and median offers a comprehensive view of central tendency, while range and standard deviation helps with understanding statistical dispersion. In addition, attaching pets_allowed as a categorical variable to the initial questions can add values for exploring the public's welcomeness towards pets over recent years.
 ```{r}
+#Have an overview of the data I will use as preparation
+
+#check data types:
+class(apt_buildings$year_registered)
+class(apt_buildings$pets_allowed)
+#check all categories under pets_allowed  and if there are missing values
+unique(apt_buildings$pets_allowed)
+missing_fire<-is.na(apt_buildings$pets_allowed)
+missing_year<-is.na(apt_buildings$year_registered)
+if (any(missing_fire)){print("yes missing_fire")} else {print("no missing_fire")}
+if (any(missing_year)){print("yes missing_year")} else {print("no missing_year")}
+
+#clean and compute
+answer1.1<-apt_buildings%>%
+  filter(!is.na(apt_buildings$pets_allowed) & !is.na(apt_buildings$year_registered)) %>%
+  group_by(pets_allowed)%>%
+  summarize(
+    Range= paste("from", min(year_registered), "to", max(year_registered)),
+    Mean=mean(year_registered),
+    Median=median(year_registered),
+    StdDev=sd(year_registered)
+  )
+print(answer1.1)
 
 ```
 
-*Q1.2Graphing*
-comment:
+**Q1.2 Graphing**
+
+*Task*: Create a graph that has at least two geom layers (Task 8).
+
+*Comment*:
+
 ```{r}
 
 ```
