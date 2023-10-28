@@ -136,6 +136,8 @@ built_reg_violin <- apt_year_reg%>%
   filter(!is.na(year_built))%>% #drop rows have missing values in year_built
   ggplot(aes(x=year_reg_group, y=year_built))+
   geom_violin(scale = "area")+
+  geom_text(aes(label = after_stat(count), group = year_reg_group), 
+            stat = "count", size=50)+
   scale_x_discrete(drop = FALSE) + # Don't drop the year before 2017
   labs(title="The Violin Plot of Building's Built Year by Registration Year Cateogory from 1805 to 2020 ",
     x= "Registration Year Cateogory",
