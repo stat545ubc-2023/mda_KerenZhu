@@ -107,8 +107,9 @@ summary(apt_buildings$year_built)
 #clean
 Q1cleaned <-apt_buildings %>%
   select(id, year_built, year_registered) %>%
-  filter(!is.na(year_registered) & !is.na(year_built)) 
-head(Q1cleaned)
+  #unsure NA represents missing value / not registered, so I filtered out all NA in year_registered
+  filter(!is.na(year_registered)&!is.na(year_built)) 
+print(Q1cleaned)
 ```
 
 **Q1.1 Summarizing**
@@ -471,9 +472,9 @@ Pick a research question from 1.2, and pick a variable of interest (we'll call i
 
 <!-------------------------- Start your work below ---------------------------->
 
-**Research Question**: If a building was built in year 2020, what year is it most likely to be registered?
+**Research Question**: What is the relationship between window pane types and year built? (coming from the original Question 4)
 
-**Variable of interest**: year_registered
+**Variable of interest**: pane_type (from Task2)
 
 <!----------------------------------------------------------------------------->
 
@@ -488,9 +489,10 @@ Fit a model or run a hypothesis test that provides insight on this variable with
     -   You could use `lm()` to test for significance of regression coefficients.
 
 <!-------------------------- Start your work below ---------------------------->
-
+I use lm() for this task.The window pane type is dependent, built year is independent.The data set used is Q4new from Task 2.
 ```{r}
-
+model<-lm(pane_type ~ year_built, data=Q4new)
+print(model)
 ```
 
 <!----------------------------------------------------------------------------->
@@ -504,6 +506,20 @@ Produce something relevant from your fitted model: either predictions on Y, or a
 -   Obtain your results using the `broom` package if possible. If your model is not compatible with the broom function you're needing, then you can obtain your results by some other means, but first indicate which broom function is not compatible.
 
 <!-------------------------- Start your work below ---------------------------->
+
+
+```{r}
+#prepare
+install.packages("broom")
+library(broom)
+
+#output a single value: p-value, using broom
+results<-tidy(model)%>%
+  select(p.value)
+
+print(results)
+
+```
 
 <!----------------------------------------------------------------------------->
 
