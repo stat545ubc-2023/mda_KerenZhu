@@ -122,13 +122,13 @@ categorical variable: year_reg_group with 3 groups (year before 2017, year 2017,
 
 ```{r}
 #create a new variable
-answer1.1 <-Q1cleaned%>%
+answer1.1.1 <-Q1cleaned%>%
   mutate(year_reg_group=factor(case_when(
       year_registered < 2017 ~ "year before 2017",
       year_registered == 2017 ~ "year 2017",
       year_registered > 2017 ~ "year after 2017"),
     levels=c('year before 2017','year 2017','year after 2017')))
-head(answer1.1)
+head(answer1.1.1)
 ```
 
 **Q1.2 Graphing**
@@ -138,21 +138,21 @@ head(answer1.1)
 *Comment*: This task is not helpful. Alpha transparency makes sense to _answer1.2_, using geom_point. This is because the darker color presents higher density. Although _answer1.2_ is helpful to understand Question 1, I think geom_dotplot is a better option to visualize the data. However, transparency doesn't make sense to this dotplot. This dotplot is better because the length differences in the graph is easier to be distinguished by human eyes than nuances in transparencies. _answer1.2_better_ makes it easier to compare the amount of buildings in their built years within and among registration year groups.
 ```{r}
 #Graph for the Task:
-answer1.2 <- answer1.1%>%
+answer1.1.2 <- answer1.1.1%>%
   ggplot(aes(year_reg_group, year_built))+
   geom_point(alpha=0.1) + #customize the transparency
   scale_x_discrete(drop = FALSE) + # Don't drop the year before 2017
   labs(title="The Dot Plot of Built Year by Registration Year Cateogory from 1805 to 2020 ", x= "Registration Year Cateogory", y="Built Year")
   
-print(answer1.2)
+print(answer1.1.2)
 
 #A better option
-answer1.2_better <- answer1.1%>%
+answer1.1.2_better <- answer1.1%>%
   ggplot(aes(year_reg_group, year_built))+
   geom_dotplot(binaxis = "y", stackdir = "center", binwidth=0.7) +
   scale_x_discrete(drop = FALSE) + # Don't drop the year before 2017
   labs(title="The Dot Plot of Built Year by Registration Year Cateogory from 1805 to 2020 ", x= "Registration Year Cateogory", y="Built Year")
-print(answer1.2_better)
+print(answer1.1.2_better)
 ```
 
 **Q2 How are the number of storeys distributed among buildings?**
@@ -184,7 +184,7 @@ In addition attaching _`non-smoking_building`_ to the initial question can help 
 
 ```{r}
 #calculate within categories
-answer2.1_seperate <- Q2cleaned %>%
+answer1.2.1_seperate <- Q2cleaned %>%
   group_by(`non-smoking_building`)%>%
   summarize(
     Range=paste(min(no_of_storeys),"-", max(no_of_storeys)),
@@ -193,7 +193,7 @@ answer2.1_seperate <- Q2cleaned %>%
     Median=median(no_of_storeys)
   )
 #calculate all
-answer2.1_total <-Q2cleaned %>%
+answer1.2.1_total <-Q2cleaned %>%
   summarize(
     `non-smoking_building`= "TOTAL",
     Range=paste(min(no_of_storeys),"-", max(no_of_storeys)),
@@ -202,9 +202,9 @@ answer2.1_total <-Q2cleaned %>%
     Median=median(no_of_storeys)
   )
 #integrate 
-answer2.1 <- bind_rows(answer2.1_seperate, answer2.1_total)
+answer1.2.1 <- bind_rows(answer1.2.1_seperate, answer1.2.1_total)
   
-print(answer2.1)
+print(answer1.2.1)
 ```
 
 **Q2.2 Graphing**
@@ -214,13 +214,13 @@ print(answer2.1)
 *Comment*: This is helpful. I used geom_boxplot to present results from summarizing task. In addition, I used geom_jitter. Adding individual data points on top of boxplots shows the distribution of data points within each category. This can be helpful to visualize the spread of the data.
 ```{r}
 #offering an overall view (not distinguish whether buildings allow smoking or not)
-answer2.2_total <- Q2cleaned %>%
+answer1.2.2_total <- Q2cleaned %>%
   reframe(
     `non-smoking_building` = "TOTAL",
     no_of_storeys = no_of_storeys
   )
 #visualize
-answer2.2 <- bind_rows(Q2cleaned, answer2.2_total) %>%
+answer1.2.2 <- bind_rows(Q2cleaned, answer2.2_total) %>%
   ggplot(aes(`non-smoking_building`, no_of_storeys))+
   geom_boxplot()+ # geom layer 1, visualizing summarizing task results
   geom_jitter(aes(color = `non-smoking_building`), alpha=0.04) + # geom layer 2
@@ -231,7 +231,7 @@ answer2.2 <- bind_rows(Q2cleaned, answer2.2_total) %>%
   )+
   scale_color_manual(values = c("TOTAL" = "blue", "YES"="red", "NO" = "red"))
   
-print(answer2.2)
+print(answer1.2.2)
 ```
 
 **Q3 How is the distribution of separate gas, hydro, and water meter services among buildings?**
@@ -269,11 +269,11 @@ water_count <- Q3cleaned %>%
   count()%>%
   pivot_wider(names_from = "separate_water_meters", values_from = "n")
 #combine
-answer3.1 <- bind_rows(gas_count, hydro_count, water_count) %>%
+answer1.3.1 <- bind_rows(gas_count, hydro_count, water_count) %>%
   mutate(Service_type=c("gas", "hydro", "water"))%>%
   select(Service_type, everything())
 
-print(answer3.1)
+print(answer1.3.1)
 ```
 
 **Q3.2 Graphing**
@@ -283,13 +283,12 @@ print(answer3.1)
 *Comment*:This is helpful. This visualization supports comparing the availability of separate gas, hydro, water services. Adding a geom_text layer makes the exact number clear to the audience.
 ```{r}
 #make tibble suitable for visualization
-longer<-answer3.1%>% #using the outcome from summarizing task
+longer<-answer1.3.1%>% #using the outcome from summarizing task
   pivot_longer(cols=c(-Service_type),
              names_to='YES_NO',
              values_to='Count') 
-print(longer)
 
-answer3.2 <- ggplot(longer, aes(x = Service_type, y = Count, fill = YES_NO)) +
+answer1.3.2 <- ggplot(longer, aes(x = Service_type, y = Count, fill = YES_NO)) +
   geom_bar(stat = "identity") + #geom layer1
   labs(
     title = "Count of YES and NO for Each Service Type",
@@ -298,7 +297,7 @@ answer3.2 <- ggplot(longer, aes(x = Service_type, y = Count, fill = YES_NO)) +
   )+
   geom_text(aes(label=Count),position = position_stack(vjust = 0.5), size=3) #geom layer 2
 
-print(answer3.2)
+print(answer1.3.2)
 
 ```
 
@@ -321,10 +320,10 @@ categorical variable:window_type
 
 *Comment*: This is helpful. _window_type_ is a categorical variable, making sense to the task. This task does not directly answer Question 4. However, it brings insight to understand the variable window_type related to Question 4.
 ```{r}
-answer4.1 <- Q4cleaned %>%
+answer1.4.1 <- Q4cleaned %>%
   group_by(window_type) %>%
   count()
-print(answer4.1)
+print(answer1.4.1)
 ```
 
 **Q4.2 Graphing**
@@ -333,13 +332,13 @@ print(answer4.1)
 
 *Comment*: This is helpful. Because there are overlaps, the transparency makes sense.The darker color presents higher density. This graph can give audiences an overview and help them come up an assumption for Question 4.
 ```{r}
-answer4.2 <- Q4cleaned%>%
+answer1.4.2 <- Q4cleaned%>%
   ggplot(aes(window_type,year_built))+
   geom_jitter(aes(color = window_type), alpha=0.2)+ #customize the transparency
   labs(title="Scatter Plot of Built Year by Window Type",
       x="Window Type",
       y="Built Year")
-print(answer4.2)
+print(answer1.4.2)
 ```
 
 <!----------------------------------------------------------------------------->
@@ -506,19 +505,14 @@ Produce something relevant from your fitted model: either predictions on Y, or a
 -   Obtain your results using the `broom` package if possible. If your model is not compatible with the broom function you're needing, then you can obtain your results by some other means, but first indicate which broom function is not compatible.
 
 <!-------------------------- Start your work below ---------------------------->
-
-
 ```{r}
 #prepare
-install.packages("broom")
 library(broom)
 
 #output a single value: p-value, using broom
 results<-tidy(model)%>%
-  select(p.value)
-
+  select(term, p.value) #select the column that contains the thing I'm looking for
 print(results)
-
 ```
 
 <!----------------------------------------------------------------------------->
@@ -535,6 +529,15 @@ Take a summary table that you made from Task 1, and write it as a csv file in yo
 -   **Reproducibility criteria**: You should be able to delete the csv file, and remake it simply by knitting this Rmd file.
 
 <!-------------------------- Start your work below ---------------------------->
+
+```{r}
+library(here)
+#check the summary table that I made from Task 1 for this task
+print(answer1.2.1)
+#write it as a csv file in my `output` folder. Use the `here::here()` function.
+output_path <- here::here("output", "summary_table.csv")
+write_csv(answer1.2.1,file = output_path, here::here("answer1.2.1.csv"))
+```
 
 <!----------------------------------------------------------------------------->
 
