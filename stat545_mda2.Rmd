@@ -106,7 +106,7 @@ summary(apt_buildings$year_built)
 
 #clean
 Q1cleaned <-apt_buildings %>%
-  select(year_built, year_registered) %>%
+  select(id, year_built, year_registered) %>%
   filter(!is.na(year_registered) & !is.na(year_built)) 
 head(Q1cleaned)
 ```
@@ -166,7 +166,7 @@ unique(apt_buildings$`non-smoking_building`)
 
 #clean
 Q2cleaned <- apt_buildings %>%
-  select(no_of_storeys, `non-smoking_building`) %>%
+  select(id, no_of_storeys, `non-smoking_building`) %>%
   filter(!is.na(no_of_storeys)&!is.na(`non-smoking_building`))
 head(Q2cleaned)
 ```
@@ -239,7 +239,7 @@ print(answer2.2)
 ```{r}
 #clean
 Q3cleaned <- apt_buildings %>%
-  select(separate_gas_meters, separate_hydro_meters, separate_water_meters) %>%
+  select(id, separate_gas_meters, separate_hydro_meters, separate_water_meters) %>%
   filter(!is.na(separate_gas_meters)&!is.na(separate_hydro_meters)&!is.na(separate_water_meters))
 head(Q3cleaned)
 ```
@@ -309,7 +309,7 @@ print(answer3.2)
 unique(apt_buildings$window_type)
 #clean
 Q4cleaned<-apt_buildings %>%
-  select(window_type, year_built)%>%
+  select(id, window_type, year_built)%>%
 filter(!is.na(window_type)&!is.na(year_built))
 head(Q4cleaned)
 ```
@@ -335,7 +335,7 @@ print(answer4.1)
 answer4.2 <- Q4cleaned%>%
   ggplot(aes(window_type,year_built))+
   geom_jitter(aes(color = window_type), alpha=0.2)+ #customize the transparency
-  lab(Title="Scatter Plot of Built Year by Window Type",
+  labs(title="Scatter Plot of Built Year by Window Type",
       x="Window Type",
       y="Built Year")
 print(answer4.2)
@@ -370,7 +370,7 @@ A reminder of the definition of *tidy* data:
 Based on the definition above, can you identify if your data is tidy or untidy? Go through all your columns, or if you have \>8 variables, just pick 8, and explain whether the data is untidy or tidy.
 
 <!--------------------------- Start your work below --------------------------->
-
+Each cleaned data set I used for my questions are tidy. This is because it meet the three requirements. First,each row represents a distinct and individual unit of data.Second, each column represents a distinct variable that is measured for each of the observations.Finally, each cell holds a single, meaningful data point related to the observation and variable it intersects
 <!----------------------------------------------------------------------------->
 
 ### 2.2 (4 points)
