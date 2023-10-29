@@ -147,7 +147,7 @@ answer1.1.2 <- answer1.1.1%>%
 print(answer1.1.2)
 
 #A better option
-answer1.1.2_better <- answer1.1%>%
+answer1.1.2_better <- answer1.1.1%>%
   ggplot(aes(year_reg_group, year_built))+
   geom_dotplot(binaxis = "y", stackdir = "center", binwidth=0.7) +
   scale_x_discrete(drop = FALSE) + # Don't drop the year before 2017
@@ -220,7 +220,7 @@ answer1.2.2_total <- Q2cleaned %>%
     no_of_storeys = no_of_storeys
   )
 #visualize
-answer1.2.2 <- bind_rows(Q2cleaned, answer2.2_total) %>%
+answer1.2.2 <- bind_rows(Q2cleaned, answer1.2.2_total) %>%
   ggplot(aes(`non-smoking_building`, no_of_storeys))+
   geom_boxplot()+ # geom layer 1, visualizing summarizing task results
   geom_jitter(aes(color = `non-smoking_building`), alpha=0.04) + # geom layer 2
@@ -535,8 +535,8 @@ library(here)
 #check the summary table that I made from Task 1 for this task
 print(answer1.2.1)
 #write it as a csv file in my `output` folder. Use the `here::here()` function.
-output_path <- here::here("output", "summary_table.csv")
-write_csv(answer1.2.1,file = output_path, here::here("answer1.2.1.csv"))
+output_path <- here::here("output", "answer1.2.1.csv")
+write_csv(answer1.2.1,file = output_path)
 ```
 
 <!----------------------------------------------------------------------------->
