@@ -106,7 +106,9 @@ summary(apt_buildings$year_built)
 
 #clean
 Q1cleaned <-apt_buildings %>%
+  select(year_built, year_registered) %>%
   filter(!is.na(year_registered) & !is.na(year_built)) 
+head(Q1cleaned)
 ```
 
 **Q1.1 Summarizing**
@@ -137,7 +139,7 @@ head(answer1.1)
 #Graph for the Task:
 answer1.2 <- answer1.1%>%
   ggplot(aes(year_reg_group, year_built))+
-  geom_point(alpha=0.1) +
+  geom_point(alpha=0.1) + #customize the transparency
   scale_x_discrete(drop = FALSE) + # Don't drop the year before 2017
   labs(title="The Dot Plot of Built Year by Registration Year Cateogory from 1805 to 2020 ", x= "Registration Year Cateogory", y="Built Year")
   
@@ -164,13 +166,15 @@ unique(apt_buildings$`non-smoking_building`)
 
 #clean
 Q2cleaned <- apt_buildings %>%
+  select(no_of_storeys, `non-smoking_building`) %>%
   filter(!is.na(no_of_storeys)&!is.na(`non-smoking_building`))
+head(Q2cleaned)
 ```
 
 **Q2.1 Summarizing**
 
 *Task*: Compute the *range*, *mean*, and *two other summary statistics* of **one numerical variable** across the groups of **one categorical variable** from your data (Task 1).
-two other summary statistics: standard deviation, mean
+two other summary statistics: standard deviation, median
 one numerical variable: no_of_storeys
 one categorical variable: `non-smoking_building`
 
@@ -178,41 +182,163 @@ one categorical variable: `non-smoking_building`
 In addition attaching _`non-smoking_building`_ to the initial question can help with making assumptions of the relationship between building's smoking type and the number of storeys.
 
 ```{r}
-
+#calculate within categories
+answer2.1_seperate <- Q2cleaned %>%
+  group_by(`non-smoking_building`)%>%
+  summarize(
+    Range=paste(min(no_of_storeys),"-", max(no_of_storeys)),
+    Mean= mean(no_of_storeys),
+    Stdev=sd(no_of_storeys),
+    Median=median(no_of_storeys)
+  )
+#calculate all
+answer2.1_total <-Q2cleaned %>%
+  summarize(
+    `non-smoking_building`= "TOTAL",
+    Range=paste(min(no_of_storeys),"-", max(no_of_storeys)),
+    Mean= mean(no_of_storeys),
+    Stdev=sd(no_of_storeys),
+    Median=median(no_of_storeys)
+  )
+#integrate 
+answer2.1 <- bind_rows(answer2.1_seperate, answer2.1_total)
+  
+print(answer2.1)
 ```
 
 **Q2.2 Graphing**
-*Task*:
 
-*Comment*:
+*Task*:Create a graph that has at least two geom layers (Task 8).
+
+*Comment*: This is helpful. I used geom_boxplot to present results from summarizing task. In addition, I used geom_jitter. Adding individual data points on top of boxplots shows the distribution of data points within each category. This can be helpful to visualize the spread of the data.
 ```{r}
+#offering an overall view (not distinguish whether buildings allow smoking or not)
+answer2.2_total <- Q2cleaned %>%
+  reframe(
+    `non-smoking_building` = "TOTAL",
+    no_of_storeys = no_of_storeys
+  )
+#visualize
+answer2.2 <- bind_rows(Q2cleaned, answer2.2_total) %>%
+  ggplot(aes(`non-smoking_building`, no_of_storeys))+
+  geom_boxplot()+ # geom layer 1, visualizing summarizing task results
+  geom_jitter(aes(color = `non-smoking_building`), alpha=0.04) + # geom layer 2
+  labs(
+    title= "The Box Plot of the Number of Storeys Categorized by Building Smoking Type",
+    x= "Is the Building Non-Smoking",
+    y= "The Number of Storeys"
+  )+
+  scale_color_manual(values = c("TOTAL" = "blue", "YES"="red", "NO" = "red"))
+  
+print(answer2.2)
+```
+
+**Q3 How is the distribution of separate gas, hydro, and water meter services among buildings?**
+
+**Preparation**
+```{r}
+#clean
+Q3cleaned <- apt_buildings %>%
+  select(separate_gas_meters, separate_hydro_meters, separate_water_meters) %>%
+  filter(!is.na(separate_gas_meters)&!is.na(separate_hydro_meters)&!is.na(separate_water_meters))
+head(Q3cleaned)
+```
+
+**Q3.1 Summarizing**
+
+*Task*: Compute the number of observations for at least one of your categorical variables. Do not use the function table() (Task 2). 
+Categorical variables: separate_gas_meters, separate_hydro_meters, separate_water_meters
+
+*Comment*: This is helpful. It offers an overview to understand the distribution of separate gas, hydro, and water meter services among buildings.
+```{r}
+library(tidyverse)
+#gas
+gas_count <- Q3cleaned %>%
+  group_by(separate_gas_meters) %>%
+  count()%>%
+  pivot_wider(names_from = "separate_gas_meters", values_from = "n")
+#hydro
+hydro_count <- Q3cleaned %>%
+  group_by(separate_hydro_meters) %>%
+  count()%>%
+  pivot_wider(names_from = "separate_hydro_meters", values_from = "n")
+#water
+water_count <- Q3cleaned %>%
+  group_by(separate_water_meters) %>%
+  count()%>%
+  pivot_wider(names_from = "separate_water_meters", values_from = "n")
+#combine
+answer3.1 <- bind_rows(gas_count, hydro_count, water_count) %>%
+  mutate(Service_type=c("gas", "hydro", "water"))%>%
+  select(Service_type, everything())
+
+print(answer3.1)
+```
+
+**Q3.2 Graphing**
+
+*Task*:Create a graph that has at least two geom layers (Task 8).
+
+*Comment*:This is helpful. This visualization supports comparing the availability of separate gas, hydro, water services. Adding a geom_text layer makes the exact number clear to the audience.
+```{r}
+#make tibble suitable for visualization
+longer<-answer3.1%>% #using the outcome from summarizing task
+  pivot_longer(cols=c(-Service_type),
+             names_to='YES_NO',
+             values_to='Count') 
+print(longer)
+
+answer3.2 <- ggplot(longer, aes(x = Service_type, y = Count, fill = YES_NO)) +
+  geom_bar(stat = "identity") + #geom layer1
+  labs(
+    title = "Count of YES and NO for Each Service Type",
+    x = "Service Type",
+    y = "Count"
+  )+
+  geom_text(aes(label=Count),position = position_stack(vjust = 0.5), size=3) #geom layer 2
+
+print(answer3.2)
 
 ```
 
-*Q3How is the distribution of separate gas, hydro, and water meter services among buildings?*
-*Q3.1Summarizing*
-comment:
-```{r}
+**Q4What is the relationship between window types and year built?**
 
+**Preparation**
+```{r}
+#overview:
+unique(apt_buildings$window_type)
+#clean
+Q4cleaned<-apt_buildings %>%
+  select(window_type, year_built)%>%
+filter(!is.na(window_type)&!is.na(year_built))
+head(Q4cleaned)
+```
+**Q4.1 Summarizing**
+
+*Task*:Compute the number of observations for at least one of your categorical variables. Do not use the function table() (Task 2).
+categorical variable:window_type
+
+*Comment*: This is helpful. _window_type_ is a categorical variable, making sense to the task. This task does not directly answer Question 4. However, it brings insight to understand the variable window_type related to Question 4.
+```{r}
+answer4.1 <- Q4cleaned %>%
+  group_by(window_type) %>%
+  count()
+print(answer4.1)
 ```
 
-*Q3.2Graphing*
-comment:
+**Q4.2 Graphing**
+
+*Task*: Make a graph where it makes sense to customize the alpha transparency (Task 7).
+
+*Comment*: This is helpful. Because there are overlaps, the transparency makes sense.The darker color presents higher density. This graph can give audiences an overview and help them come up an assumption for Question 4.
 ```{r}
-
-```
-
-*Q4What is the relationship between window types and year built?*
-*Q4.1Summarizing*
-comment:
-```{r}
-
-```
-
-*Q4.2Graphing*
-comment:
-```{r}
-
+answer4.2 <- Q4cleaned%>%
+  ggplot(aes(window_type,year_built))+
+  geom_jitter(aes(color = window_type), alpha=0.2)+ #customize the transparency
+  lab(Title="Scatter Plot of Built Year by Window Type",
+      x="Window Type",
+      y="Built Year")
+print(answer4.2)
 ```
 
 <!----------------------------------------------------------------------------->
@@ -222,8 +348,11 @@ comment:
 Based on the operations that you've completed, how much closer are you to answering your research questions? Think about what aspects of your research questions remain unclear. Can your research questions be refined, now that you've investigated your data a bit more? Which research questions are yielding interesting results?
 
 <!------------------------- Write your answer here ---------------------------->
-
-
+While getting closer to the research questions, there are still aspects remain unclear and some needs to redefine. Particularly: 
+* Q1: This question needs redefine. The key problem is that the range and variety of year_registered is not as wide as year_built. While year_built ranges from 1805-2019, buildings mainly registered in 2017. Digging into more details about the density of building registered year still has value, but redefining the question as _what is the relationship between year_registered and year_built?_ makes more sense to explore the City of Toronto's advancement in managing apartment buildings.
+*Q2: This question is basically answered. Further exploration may include exploring the relationship between non-smoking_building and the number of storeys.
+*Q3: This question is basically answered. Further exploration may include exploring how different combinations of separate_gas_meters,separate_hydro_meters,separate_water_meters services are distributed among buildings.
+*Q4: This question remains unclear. The gap of the number of buildings categorized by window types is large. Need to find a suitable model to conduct statistical test to further answer this question.
 <!----------------------------------------------------------------------------->
 
 # Task 2: Tidy your data 
