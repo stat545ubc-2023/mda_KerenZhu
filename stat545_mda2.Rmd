@@ -1,7 +1,7 @@
 
 ---
 title: "Mini Data Analysis Milestone 2"
-output: html_document
+output: github_document
 ---
 
 *To complete this milestone, you can either edit [this `.rmd` file](https://raw.githubusercontent.com/UBC-STAT/stat545.stat.ubc.ca/master/content/mini-project/mini-project-2.Rmd) directly. Fill in the sections that are commented out with `<!--- start your work here--->`. When you are done, make sure to knit to an `.md` file by changing the output in the YAML header to `github_document`, before submitting a tagged release on canvas.*
@@ -97,6 +97,18 @@ Make sure it's clear what research question you are doing each operation for!
 <!------------------------- Start your work below ----------------------------->
 **Q1 What is the density of building registered year?**
 
+**Preparation**
+```{r}
+#overview
+class(apt_buildings$year_registered)
+summary(apt_buildings$year_registered)
+summary(apt_buildings$year_built) 
+
+#clean
+Q1cleaned <-apt_buildings %>%
+  filter(!is.na(year_registered) & !is.na(year_built)) 
+```
+
 **Q1.1 Summarizing**
 
 *Task*: Create a categorical variable with 3 or more groups from an existing numerical variable. You can use this new variable in the other tasks (Task 3).
@@ -106,55 +118,73 @@ categorical variable: year_reg_group with 3 groups (year before 2017, year 2017,
 *Comment*: This task is helpful. While designing the question at the first stage for MDA1, I thought year_registered would be like year_built and a density plot is applicable. Indeed, the original data set apt_buildings gives year_registered dbl data type. However, through _"explore year_registered"_, I found the range and variety of year_registered is not as wide as year_built. While year_built ranges from 1805-2019, buildings mainly registered in 2017. Thereby, I set a new categorical variable named year_reg_group with 3 groups (year before 2017, year 2017, year after 2017) with an assumption that 2017 is an identical year for building registration and management. This task thus can serve as a preparation for future tasks to explore the City of Toronto's advancement in managing apartment buildings, which is aligned with the primary goal of bringing up _Question 1_.
 
 ```{r}
-#explore year_registered:
-class(apt_buildings$year_registered)
-summary(apt_buildings$year_registered)
-summary(apt_buildings$year_built) 
-  
-#clean and compute
-apt_year_reg <-apt_buildings%>%
-  filter(!is.na(year_registered)) %>%
-  mutate(
-    year_reg_group = 
-      factor(case_when(year_registered < 2017 ~ "year before 2017",
+#create a new variable
+answer1.1 <-Q1cleaned%>%
+  mutate(year_reg_group=factor(case_when(
+      year_registered < 2017 ~ "year before 2017",
       year_registered == 2017 ~ "year 2017",
       year_registered > 2017 ~ "year after 2017"),
     levels=c('year before 2017','year 2017','year after 2017')))
-print(apt_year_reg)
+head(answer1.1)
 ```
-
-
 
 **Q1.2 Graphing**
 
-*Task*: (Task 7).
+*Task*: Make a graph where it makes sense to customize the alpha transparency (Task 7).
+
+*Comment*: This task is not helpful. Alpha transparency makes sense to _answer1.2_, using geom_point. This is because the darker color presents higher density. Although _answer1.2_ is helpful to understand Question 1, I think geom_dotplot is a better option to visualize the data. However, transparency doesn't make sense to this dotplot. This dotplot is better because the length differences in the graph is easier to be distinguished by human eyes than nuances in transparencies. _answer1.2_better_ makes it easier to compare the amount of buildings in their built years within and among registration year groups.
+```{r}
+#Graph for the Task:
+answer1.2 <- answer1.1%>%
+  ggplot(aes(year_reg_group, year_built))+
+  geom_point(alpha=0.1) +
+  scale_x_discrete(drop = FALSE) + # Don't drop the year before 2017
+  labs(title="The Dot Plot of Built Year by Registration Year Cateogory from 1805 to 2020 ", x= "Registration Year Cateogory", y="Built Year")
+  
+print(answer1.2)
+
+#A better option
+answer1.2_better <- answer1.1%>%
+  ggplot(aes(year_reg_group, year_built))+
+  geom_dotplot(binaxis = "y", stackdir = "center", binwidth=0.7) +
+  scale_x_discrete(drop = FALSE) + # Don't drop the year before 2017
+  labs(title="The Dot Plot of Built Year by Registration Year Cateogory from 1805 to 2020 ", x= "Registration Year Cateogory", y="Built Year")
+print(answer1.2_better)
+```
+
+**Q2 How are the number of storeys distributed among buildings?**
+
+**Preparation**
+```{r}
+#overview
+class(apt_buildings$no_of_storeys)
+class(apt_buildings$`non-smoking_building`)
+summary(apt_buildings$no_of_storeys)
+unique(apt_buildings$`non-smoking_building`)
+
+#clean
+Q2cleaned <- apt_buildings %>%
+  filter(!is.na(no_of_storeys)&!is.na(`non-smoking_building`))
+```
+
+**Q2.1 Summarizing**
+
+*Task*: Compute the *range*, *mean*, and *two other summary statistics* of **one numerical variable** across the groups of **one categorical variable** from your data (Task 1).
+two other summary statistics: standard deviation, mean
+one numerical variable: no_of_storeys
+one categorical variable: `non-smoking_building`
+
+*Comment*: This is helpful. It highly links to Question 2. Computing mean and median supports measuring central tendency and computing range and standard deviation supports measuring statistical dispersion.
+In addition attaching _`non-smoking_building`_ to the initial question can help with making assumptions of the relationship between building's smoking type and the number of storeys.
+
+```{r}
+
+```
+
+**Q2.2 Graphing**
+*Task*:
 
 *Comment*:
-
-```{r}
-built_reg_violin <- apt_year_reg%>%
-  filter(!is.na(year_built))%>% #drop rows have missing values in year_built
-  ggplot(aes(x=year_reg_group, y=year_built))+
-  geom_violin(scale = "area")+
-  geom_text(aes(label = after_stat(count), group = year_reg_group), 
-            stat = "count", size=50)+
-  scale_x_discrete(drop = FALSE) + # Don't drop the year before 2017
-  labs(title="The Violin Plot of Building's Built Year by Registration Year Cateogory from 1805 to 2020 ",
-    x= "Registration Year Cateogory",
-    y="Built Year")+
-  theme_minimal()
-print(built_reg_point)
-```
-
-*Q2How are the number of storeys distributed among buildings?*
-*Q2.1Summarizing*
-comment:
-```{r}
-
-```
-
-*Q2.2Graphing*
-comment:
 ```{r}
 
 ```
