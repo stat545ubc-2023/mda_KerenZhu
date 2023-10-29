@@ -127,7 +127,8 @@ answer1.1.1 <-Q1cleaned%>%
       year_registered < 2017 ~ "year before 2017",
       year_registered == 2017 ~ "year 2017",
       year_registered > 2017 ~ "year after 2017"),
-    levels=c('year before 2017','year 2017','year after 2017')))
+    levels=c('year before 2017','year 2017','year after 2017')))%>%
+    select(-year_registered)
 head(answer1.1.1)
 ```
 
@@ -548,6 +549,14 @@ Write your model object from Task 3 to an R binary file (an RDS), and load it ag
 -   The same robustness and reproducibility criteria as in 4.1 apply here.
 
 <!-------------------------- Start your work below ---------------------------->
+```{r}
+# Define the output file path
+model_output_path <- here::here("output", "model.rds") 
+# Save my model object from Task 3 to an R binary file (an RDS).Use the functions `saveRDS()`
+saveRDS(model, file = model_output_path)
+# Reload use `readRDS()`.
+reload_model <- readRDS(model_output_path)
+```
 
 <!----------------------------------------------------------------------------->
 
