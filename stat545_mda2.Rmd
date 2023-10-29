@@ -370,7 +370,10 @@ A reminder of the definition of *tidy* data:
 Based on the definition above, can you identify if your data is tidy or untidy? Go through all your columns, or if you have \>8 variables, just pick 8, and explain whether the data is untidy or tidy.
 
 <!--------------------------- Start your work below --------------------------->
-Each cleaned data set I used for my questions are tidy. This is because it meet the three requirements. First,each row represents a distinct and individual unit of data.Second, each column represents a distinct variable that is measured for each of the observations.Finally, each cell holds a single, meaningful data point related to the observation and variable it intersects
+
+I choose the data set _Q1cleaned_ in Task 1 for *Q1 What is the density of building registered year?*  as the context to answer this question. 
+
+It is tidy because it meets the three requirements. Each row represents a distinct and individual unit of data. Each column represents a distinct variable that is measured for each of the observations. Each cell holds a single, meaningful data point related to the observation and variable it intersects. 
 <!----------------------------------------------------------------------------->
 
 ### 2.2 (4 points)
@@ -382,6 +385,23 @@ If your data is untidy, then tidy it! Then, untidy it back to it's original stat
 Be sure to explain your reasoning for this task. Show us the "before" and "after".
 
 <!--------------------------- Start your work below --------------------------->
+Before:
+```{r}
+head(Q1cleaned)
+```
+After:
+```{r}
+#untidy my data
+untidied <- Q1cleaned %>%
+  #make 2 rows present the same observation
+  add_row(id=10359, year_built=1967, year_registered=2017)%>% 
+  arrange(id)%>%
+  #violate Each column is a **variable**
+  tidyr::unite(col=BuiltYear_RegisteredYear,c("year_built","year_registered"), sep="_")
+#violate each cell is a **value**
+untidied[3,"BuiltYear_RegisteredYear"]<-"trhivhsk"
+head(untidied)
+```
 
 <!----------------------------------------------------------------------------->
 
