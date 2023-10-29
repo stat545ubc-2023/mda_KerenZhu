@@ -410,23 +410,58 @@ head(untidied)
 Now, you should be more familiar with your data, and also have made progress in answering your research questions. Based on your interest, and your analyses, pick 2 of the 4 research questions to continue your analysis in the remaining tasks:
 
 <!-------------------------- Start your work below ---------------------------->
-
-1.  *FILL_THIS_IN*
-2.  *FILL_THIS_IN*
-
+1.  *How is the distribution of separate gas, hydro, and water meter services among buildings?*
+2.  *What is the relationship between window types and year built?*
 <!----------------------------------------------------------------------------->
 
 Explain your decision for choosing the above two research questions.
 
 <!--------------------------- Start your work below --------------------------->
-
+**As explained previously, Q1 needs to be redefined. Besides, 4~8 functions are required for the following task, to make a different, Q2 is not complicated enough. **
 <!----------------------------------------------------------------------------->
 
-Now, try to choose a version of your data that you think will be appropriate to answer these 2 questions. Use between 4 and 8 functions that we've covered so far (i.e. by filtering, cleaning, tidy'ing, dropping irrelevant columns, etc.).
+Now, try to choose a version of your data that you think will be appropriate to answer these 2 questions. Use between 4 and 8 functions that we've covered so far (i.e. by filtering, cleaning, tidying, dropping irrelevant columns, etc.).
 
 (If it makes more sense, then you can make/pick two versions of your data, one for each research question.) 
 
 <!--------------------------- Start your work below --------------------------->
+Before:
+```{r}
+head(Q3cleaned)
+head(Q4cleaned)
+```
+After:
+```{r}
+# For Q3
+Q3new<-Q3cleaned%>%
+  #Function 1:mutate()
+  mutate(separate_gas_meters = ifelse(separate_gas_meters == "YES", 1, 0),
+         separate_hydro_meters = ifelse(separate_hydro_meters == "YES", 1, 0),
+         separate_water_meters = ifelse(separate_water_meters == "YES", 1, 0)
+         )%>%
+  #Function 2: tidyr::unite()
+  tidyr::unite(col=gas_hydro_water,c("separate_gas_meters","separate_hydro_meters", "separate_water_meters"), sep="")
+print(Q3new)
+
+#For Q4
+Q4new <- Q4cleaned %>%
+  #Function 3: filter()>>> because the window types are not mutually exclusive, DOUBLE PANE can also be THERMAL
+  filter(window_type!="THERMAL")%>%
+  mutate(window_type=ifelse(window_type=="DOUBLE PANE", 2, 1))%>%
+  #Function 4: rename()
+  rename(pane_type = window_type)%>%
+  #Function 5: as.integer()
+  mutate(pane_type = as.integer(pane_type))
+print(Q4new) 
+
+#Note: functions like select() already used to prepare data for Task 1. Because I am not sure if all functions I listed above counts, I practiced Function 6: full_join() to make one data set for Q3 and Q4.
+
+#Function 6: full_join()
+Q3Q4<-full_join(Q3new, Q4new, by="id")
+print(Q3Q4)
+```
+
+<!----------------------------------------------------------------------------->
 
 # Task 3: Modelling
 
@@ -436,9 +471,9 @@ Pick a research question from 1.2, and pick a variable of interest (we'll call i
 
 <!-------------------------- Start your work below ---------------------------->
 
-**Research Question**: FILL_THIS_IN
+**Research Question**: If a building was built in year 2020, what year is it most likely to be registered?
 
-**Variable of interest**: FILL_THIS_IN
+**Variable of interest**: year_registered
 
 <!----------------------------------------------------------------------------->
 
