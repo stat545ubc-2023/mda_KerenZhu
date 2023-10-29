@@ -489,6 +489,10 @@ Fit a model or run a hypothesis test that provides insight on this variable with
 
 <!-------------------------- Start your work below ---------------------------->
 
+```{r}
+
+```
+
 <!----------------------------------------------------------------------------->
 
 ## 3.2 (3 points)
