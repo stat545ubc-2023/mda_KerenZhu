@@ -594,24 +594,30 @@ research questions are yielding interesting results?
 
 <!------------------------- Write your answer here ---------------------------->
 
-While getting closer to the research questions, there are still aspects
-remain unclear and some needs to redefine. Particularly: \* Q1: This
-question needs redefine. The key problem is that the range and variety
-of year_registered is not as wide as year_built. While year_built ranges
-from 1805-2019, buildings mainly registered in 2017. Digging into more
-details about the density of building registered year still has value,
-but redefining the question as *what is the relationship between
-year_registered and year_built?* makes more sense to explore the City of
-Toronto’s advancement in managing apartment buildings. *Q2: This
-question is basically answered. Further exploration may include
-exploring the relationship between non-smoking_building and the number
-of storeys. *Q3: This question is basically answered. Further
-exploration may include exploring how different combinations of
-separate_gas_meters,separate_hydro_meters,separate_water_meters services
-are distributed among buildings. \*Q4: This question remains unclear.
-The gap of the number of buildings categorized by window types is large.
-Need to find a suitable model to conduct statistical test to further
-answer this question.
+**While getting closer to the research questions, there are still
+aspects remain unclear and some needs to redefine. Particularly:**
+
+- Q1 needs redefine. The key problem is that the range and variety of
+  year_registered is not as wide as year_built. While year_built ranges
+  from 1805-2019, buildings mainly registered in 2017. Digging into more
+  details about the density of building registered year still has value,
+  but redefining the question as *what is the relationship between
+  year_registered and year_built?* makes more sense to explore the City
+  of Toronto’s advancement in managing apartment buildings.
+
+- Q2 is basically answered. Further exploration may include exploring
+  the relationship between non-smoking_building and the number of
+  storeys.
+
+- Q3 is basically answered. Further exploration may include exploring
+  how different combinations of
+  separate_gas_meters,separate_hydro_meters,separate_water_meters
+  services are distributed among buildings.
+
+- Q4 remains unclear. The gap of the number of buildings categorized by
+  window types is large. Need to find a suitable model to conduct
+  statistical test to further answer this question.
+
 <!----------------------------------------------------------------------------->
 
 # Task 2: Tidy your data
@@ -633,14 +639,15 @@ pick 8, and explain whether the data is untidy or tidy.
 
 <!--------------------------- Start your work below --------------------------->
 
-I choose the data set *Q1cleaned* in Task 1 for *Q1 What is the density
-of building registered year?* as the context to answer this question.
+**I choose the data set *Q1cleaned* in Task 1 for Question 1 as the
+context to answer this question.**
 
-It is tidy because it meets the three requirements. Each row represents
-a distinct and individual unit of data. Each column represents a
-distinct variable that is measured for each of the observations. Each
-cell holds a single, meaningful data point related to the observation
-and variable it intersects.
+**It is tidy because it meets the three requirements. Each row
+represents a distinct and individual unit of data. Each column
+represents a distinct variable that is measured for each of the
+observations. Each cell holds a single, meaningful data point related to
+the observation and variable it intersects.**
+
 <!----------------------------------------------------------------------------->
 
 ### 2.2 (4 points)
@@ -719,7 +726,7 @@ Explain your decision for choosing the above two research questions.
 
 **As explained previously, Q1 needs to be redefined. Besides, 4~8
 functions are required for the following task, to make a different, Q2
-is not complicated enough. **
+is not complicated enough.**
 <!----------------------------------------------------------------------------->
 
 Now, try to choose a version of your data that you think will be
@@ -731,6 +738,10 @@ dropping irrelevant columns, etc.).
 data, one for each research question.)
 
 <!--------------------------- Start your work below --------------------------->
+
+**I made two versions of my data, one for each question.**
+
+**For Q3**
 
 Before:
 
@@ -748,21 +759,7 @@ head(Q3cleaned)
     ## 5 10363 NO                  YES                   NO                   
     ## 6 10364 NO                  YES                   NO
 
-``` r
-head(Q4cleaned)
-```
-
-    ## # A tibble: 6 × 3
-    ##      id window_type year_built
-    ##   <dbl> <chr>            <dbl>
-    ## 1 10359 DOUBLE PANE       1967
-    ## 2 10360 DOUBLE PANE       1970
-    ## 3 10361 DOUBLE PANE       1927
-    ## 4 10362 DOUBLE PANE       1959
-    ## 5 10363 DOUBLE PANE       1943
-    ## 6 10364 SINGLE PANE       1952
-
-After:
+After
 
 ``` r
 # For Q3
@@ -792,8 +789,27 @@ print(Q3new)
     ## 10 10368 000            
     ## # ℹ 3,356 more rows
 
+**For Q4**
+
+Before
+
 ``` r
-#For Q4
+head(Q4cleaned)
+```
+
+    ## # A tibble: 6 × 3
+    ##      id window_type year_built
+    ##   <dbl> <chr>            <dbl>
+    ## 1 10359 DOUBLE PANE       1967
+    ## 2 10360 DOUBLE PANE       1970
+    ## 3 10361 DOUBLE PANE       1927
+    ## 4 10362 DOUBLE PANE       1959
+    ## 5 10363 DOUBLE PANE       1943
+    ## 6 10364 SINGLE PANE       1952
+
+After:
+
+``` r
 Q4new <- Q4cleaned %>%
   #Function 3: filter()>>> because the window types are not mutually exclusive, DOUBLE PANE can also be THERMAL
   filter(window_type!="THERMAL")%>%
@@ -820,9 +836,11 @@ print(Q4new)
     ## 10 10369         2       1945
     ## # ℹ 3,341 more rows
 
-``` r
-#Note: functions like select() already used to prepare data for Task 1. Because I am not sure if all functions I listed above counts, I practiced Function 6: full_join() to make one data set for Q3 and Q4.
+Note: functions like select() already used to prepare data for Task 1.
+Because I am not sure if all functions I listed above counts, I
+practiced Function 6: full_join() to make one data set for Q3 and Q4.
 
+``` r
 #Function 6: full_join()
 Q3Q4<-full_join(Q3new, Q4new, by="id")
 print(Q3Q4)
@@ -855,10 +873,14 @@ these.
 
 <!-------------------------- Start your work below ---------------------------->
 
-**Research Question**: What is the relationship between window pane
-types and year built? (coming from the original Question 4)
+**Research Question**:
 
-**Variable of interest**: pane_type (from Task2)
+What is the relationship between window pane types and year built?
+(coming from the original Question 4)
+
+**Variable of interest**:
+
+pane_type (from Task2)
 
 <!----------------------------------------------------------------------------->
 
@@ -884,8 +906,8 @@ specifics in STAT 545.
 
 <!-------------------------- Start your work below ---------------------------->
 
-I use lm() for this task.The window pane type is dependent, built year
-is independent.The data set used is Q4new from Task 2.
+**I use lm() for this task.The window pane type is dependent, built year
+is independent.The data set used is Q4new from Task 2.**
 
 ``` r
 model<-lm(pane_type ~ year_built, data=Q4new)

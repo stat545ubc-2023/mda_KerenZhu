@@ -349,11 +349,20 @@ print(answer1.4.2)
 Based on the operations that you've completed, how much closer are you to answering your research questions? Think about what aspects of your research questions remain unclear. Can your research questions be refined, now that you've investigated your data a bit more? Which research questions are yielding interesting results?
 
 <!------------------------- Write your answer here ---------------------------->
-While getting closer to the research questions, there are still aspects remain unclear and some needs to redefine. Particularly: 
-* Q1: This question needs redefine. The key problem is that the range and variety of year_registered is not as wide as year_built. While year_built ranges from 1805-2019, buildings mainly registered in 2017. Digging into more details about the density of building registered year still has value, but redefining the question as _what is the relationship between year_registered and year_built?_ makes more sense to explore the City of Toronto's advancement in managing apartment buildings.
-*Q2: This question is basically answered. Further exploration may include exploring the relationship between non-smoking_building and the number of storeys.
-*Q3: This question is basically answered. Further exploration may include exploring how different combinations of separate_gas_meters,separate_hydro_meters,separate_water_meters services are distributed among buildings.
-*Q4: This question remains unclear. The gap of the number of buildings categorized by window types is large. Need to find a suitable model to conduct statistical test to further answer this question.
+
+**While getting closer to the research questions, there are still aspects remain unclear and some needs to redefine. Particularly:**
+  
+- Q1 needs redefine. The key problem is that the range and variety of year_registered is not as wide as year_built. While year_built ranges from 1805-2019, buildings mainly registered in 2017. Digging into more details about the density of building registered year still has value, but redefining the question as _what is the relationship between year_registered and year_built?_ makes more sense to explore the City of Toronto's advancement in managing apartment buildings.
+
+
+- Q2 is basically answered. Further exploration may include exploring the relationship between non-smoking_building and the number of storeys.
+
+
+- Q3 is basically answered. Further exploration may include exploring how different combinations of separate_gas_meters,separate_hydro_meters,separate_water_meters services are distributed among buildings.
+
+
+- Q4 remains unclear. The gap of the number of buildings categorized by window types is large. Need to find a suitable model to conduct statistical test to further answer this question.
+
 <!----------------------------------------------------------------------------->
 
 # Task 2: Tidy your data 
@@ -372,9 +381,10 @@ Based on the definition above, can you identify if your data is tidy or untidy? 
 
 <!--------------------------- Start your work below --------------------------->
 
-I choose the data set _Q1cleaned_ in Task 1 for *Q1 What is the density of building registered year?*  as the context to answer this question. 
+**I choose the data set _Q1cleaned_ in Task 1 for Question 1 as the context to answer this question.** 
 
-It is tidy because it meets the three requirements. Each row represents a distinct and individual unit of data. Each column represents a distinct variable that is measured for each of the observations. Each cell holds a single, meaningful data point related to the observation and variable it intersects. 
+**It is tidy because it meets the three requirements. Each row represents a distinct and individual unit of data. Each column represents a distinct variable that is measured for each of the observations. Each cell holds a single, meaningful data point related to the observation and variable it intersects.**
+
 <!----------------------------------------------------------------------------->
 
 ### 2.2 (4 points)
@@ -418,7 +428,7 @@ Now, you should be more familiar with your data, and also have made progress in 
 Explain your decision for choosing the above two research questions.
 
 <!--------------------------- Start your work below --------------------------->
-**As explained previously, Q1 needs to be redefined. Besides, 4~8 functions are required for the following task, to make a different, Q2 is not complicated enough. **
+**As explained previously, Q1 needs to be redefined. Besides, 4~8 functions are required for the following task, to make a different, Q2 is not complicated enough.**
 <!----------------------------------------------------------------------------->
 
 Now, try to choose a version of your data that you think will be appropriate to answer these 2 questions. Use between 4 and 8 functions that we've covered so far (i.e. by filtering, cleaning, tidying, dropping irrelevant columns, etc.).
@@ -426,12 +436,15 @@ Now, try to choose a version of your data that you think will be appropriate to 
 (If it makes more sense, then you can make/pick two versions of your data, one for each research question.) 
 
 <!--------------------------- Start your work below --------------------------->
+**I made two versions of my data, one for each question.**
+
+**For Q3**
+
 Before:
 ```{r}
 head(Q3cleaned)
-head(Q4cleaned)
 ```
-After:
+After
 ```{r}
 # For Q3
 Q3new<-Q3cleaned%>%
@@ -443,8 +456,16 @@ Q3new<-Q3cleaned%>%
   #Function 2: tidyr::unite()
   tidyr::unite(col=gas_hydro_water,c("separate_gas_meters","separate_hydro_meters", "separate_water_meters"), sep="")
 print(Q3new)
+```
+**For Q4**
 
-#For Q4
+Before
+```{r}
+head(Q4cleaned)
+```
+
+After:
+```{r}
 Q4new <- Q4cleaned %>%
   #Function 3: filter()>>> because the window types are not mutually exclusive, DOUBLE PANE can also be THERMAL
   filter(window_type!="THERMAL")%>%
@@ -454,9 +475,10 @@ Q4new <- Q4cleaned %>%
   #Function 5: as.integer()
   mutate(pane_type = as.integer(pane_type))
 print(Q4new) 
+```
 
-#Note: functions like select() already used to prepare data for Task 1. Because I am not sure if all functions I listed above counts, I practiced Function 6: full_join() to make one data set for Q3 and Q4.
-
+Note: functions like select() already used to prepare data for Task 1. Because I am not sure if all functions I listed above counts, I practiced Function 6: full_join() to make one data set for Q3 and Q4.
+```{r}
 #Function 6: full_join()
 Q3Q4<-full_join(Q3new, Q4new, by="id")
 print(Q3Q4)
@@ -472,9 +494,13 @@ Pick a research question from 1.2, and pick a variable of interest (we'll call i
 
 <!-------------------------- Start your work below ---------------------------->
 
-**Research Question**: What is the relationship between window pane types and year built? (coming from the original Question 4)
+**Research Question**: 
 
-**Variable of interest**: pane_type (from Task2)
+What is the relationship between window pane types and year built? (coming from the original Question 4)
+
+**Variable of interest**: 
+
+pane_type (from Task2)
 
 <!----------------------------------------------------------------------------->
 
@@ -489,7 +515,7 @@ Fit a model or run a hypothesis test that provides insight on this variable with
     -   You could use `lm()` to test for significance of regression coefficients.
 
 <!-------------------------- Start your work below ---------------------------->
-I use lm() for this task.The window pane type is dependent, built year is independent.The data set used is Q4new from Task 2.
+**I use lm() for this task.The window pane type is dependent, built year is independent.The data set used is Q4new from Task 2.**
 ```{r}
 model<-lm(pane_type ~ year_built, data=Q4new)
 print(model)
